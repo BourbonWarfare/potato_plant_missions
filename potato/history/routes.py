@@ -15,9 +15,17 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """
+from history import api
 
-def route(app):
-    @app.get("/bar")
-    def bar():
-        return {"abc": "def"}
+def route(app, engine):
+    mission_connection = api.Missions(engine)
+
+    @app.get('/history/missions_by_uuid/')
+    async def get_missions_by_uuid(uuid: str):
+        print(mission_connection)
+        return mission_connection.get_missions_by_uuid(uuid=uuid)
+
+    @app.get('/history/last_missions/')
+    async def get_mission_history(last_sessions: int = 1):
+        return mission_connection.get_missions(last_sessions)
 

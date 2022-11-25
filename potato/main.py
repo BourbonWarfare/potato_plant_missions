@@ -17,39 +17,12 @@
 """
 from fastapi import FastAPI
 from sqlalchemy import create_engine
-from sqlalchemy.orm import Session
-from sqlalchemy.orm import DeclarativeBase
-from sqlalchemy.orm import Mapped
-from sqlalchemy.orm import mapped_column
-from sqlalchemy import String
 
-from history import routes
+import history.routes
 
 app = FastAPI()
 engine = create_engine("mysql+mysqldb://root:@db:3306/potato_missions", echo=True)
 
-routes.route(app)
+history.routes.route(app, engine)
 
-class Base(DeclarativeBase):
-    pass
-
-class Mission(Base):
-    __tablename__ = "test_table"
-
-    id: Mapped[int] = mapped_column(primary_key = True)
-    name: Mapped[str] = mapped_column(String(30))
-
-@app.get("/")
-async def root():
-    return {"message": "Hello World"}
-
-@app.get("/db")
-async def db_get_test():
-    with Session(engine) as session:
-        m = Mission(
-                name = "ljadshrt893"
-                )
-
-        session.add_all([m])
-        session.commit()
 
