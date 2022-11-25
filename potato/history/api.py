@@ -17,8 +17,37 @@
 """
 from sqlalchemy.orm import Session
 from sqlalchemy import select
+from pydantic import BaseModel
 
 from history.models import Mission
+
+class CreateMissionRequest(BaseModel):
+    mission_uuid: str
+    player_count: int
+    players_present: dict
+    length: int
+    date: int
+
+    def is_valid(self):
+        if self.player_count <= 0:
+            return False
+        if self.players_present is {}:
+            return False
+        if self.length <= 0:
+            return False
+        if self.date <= 0:
+            return False
+        return True
+
+    def create_model(self):
+        return Mission(
+                id = None,
+                mission_uuid = self.mission_uuid,
+                player_count = self.player_count,
+                players_present = self.players_present,
+                length = self.length,
+                date = self.date
+        )
 
 class Missions():
     def __init__(self, engine):
@@ -43,4 +72,8 @@ class Missions():
             last_n_missions.append(mission.as_dict())
 
         return last_n_missions
+
+    def add_mission(self, request: CreateMissionRequest):
+        self.session.add(request.create_model())
+        self.session.commit()
 

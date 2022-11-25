@@ -29,3 +29,12 @@ def route(app, engine):
     async def get_mission_history(last_sessions: int = 1):
         return mission_connection.get_missions(last_sessions)
 
+    @app.post('/history/add_mission')
+    async def add_mission(request: api.CreateMissionRequest):
+        if not request.is_valid():
+            return { "added": False }
+        mission_connection.add_mission(request)
+
+        return { "added": True }
+
+
